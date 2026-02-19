@@ -1,16 +1,54 @@
 /* ============================================================
+   CACHE EM MEMÓRIA — reduz leituras no D1
+============================================================ */
+const CACHE = { users: null, bookings: null, ts: {} };
+const CACHE_TTL = 30000; // 30 segundos
+
+/* ============================================================
    CONEXÃO COM O BANCO D1 (API)
 ============================================================ */
 const API = {
     u: {
-        get:  async ()  => { try { const r = await fetch('/api/users');    return await r.json(); } catch(e) { return []; } },
-        save: async (d) => { await fetch('/api/users',   { method: 'POST',   headers: {'Content-Type':'application/json'}, body: JSON.stringify(d) }); },
-        del:  async (id)=> { await fetch(`/api/users?id=${id}`,   { method: 'DELETE' }); }
+        get: async (force = false) => {
+            const now = Date.now();
+            if (!force && CACHE.users && (now - CACHE.ts.users) < CACHE_TTL)
+                return CACHE.users;
+            try {
+                const r = await fetch('/api/users');
+                CACHE.users = await r.json();
+                CACHE.ts.users = now;
+                return CACHE.users;
+            } catch(e) { return []; }
+        },
+        save: async (d) => {
+            CACHE.users = null;
+            await fetch('/api/users', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(d) });
+        },
+        del: async (id) => {
+            CACHE.users = null;
+            await fetch(`/api/users?id=${id}`, { method: 'DELETE' });
+        }
     },
     b: {
-        get:  async ()  => { try { const r = await fetch('/api/bookings'); return await r.json(); } catch(e) { return []; } },
-        save: async (d) => { await fetch('/api/bookings', { method: 'POST',   headers: {'Content-Type':'application/json'}, body: JSON.stringify(d) }); },
-        del:  async (id)=> { await fetch(`/api/bookings?id=${id}`, { method: 'DELETE' }); }
+        get: async (force = false) => {
+            const now = Date.now();
+            if (!force && CACHE.bookings && (now - CACHE.ts.bookings) < CACHE_TTL)
+                return CACHE.bookings;
+            try {
+                const r = await fetch('/api/bookings');
+                CACHE.bookings = await r.json();
+                CACHE.ts.bookings = now;
+                return CACHE.bookings;
+            } catch(e) { return []; }
+        },
+        save: async (d) => {
+            CACHE.bookings = null;
+            await fetch('/api/bookings', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(d) });
+        },
+        del: async (id) => {
+            CACHE.bookings = null;
+            await fetch(`/api/bookings?id=${id}`, { method: 'DELETE' });
+        }
     }
 };
 
