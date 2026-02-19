@@ -620,12 +620,21 @@
                 <option value="F">Feminino</option>
             </select>
         </div>
-        <div style="display:flex;align-items:center;gap:14px;margin-bottom:26px;background:var(--bg-body);padding:14px 18px;border-radius:14px;border:1.5px solid var(--border)">
-            <input type="checkbox" id="adm-maca" style="width:20px;height:20px;cursor:pointer;accent-color:var(--accent)">
-            <label for="adm-maca" style="font-weight:700;font-size:0.95rem;cursor:pointer">
-                <i class="fa-solid fa-bed" style="color:var(--accent);margin-right:6px"></i>
-                Usa Sala com Maca?
-            </label>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:26px">
+            <div style="display:flex;align-items:center;gap:14px;background:var(--bg-body);padding:14px 18px;border-radius:14px;border:1.5px solid var(--border)">
+                <input type="checkbox" id="adm-maca" style="width:20px;height:20px;cursor:pointer;accent-color:var(--accent)">
+                <label for="adm-maca" style="font-weight:700;font-size:0.95rem;cursor:pointer">
+                    <i class="fa-solid fa-bed" style="color:var(--accent);margin-right:6px"></i>
+                    Usa Sala com Maca?
+                </label>
+            </div>
+            <div style="display:flex;align-items:center;gap:14px;background:var(--bg-body);padding:14px 18px;border-radius:14px;border:1.5px solid var(--border)">
+                <input type="checkbox" id="adm-manicure" style="width:20px;height:20px;cursor:pointer;accent-color:var(--female-color)">
+                <label for="adm-manicure" style="font-weight:700;font-size:0.95rem;cursor:pointer">
+                    <i class="fa-solid fa-hand-sparkles" style="color:var(--female-color);margin-right:6px"></i>
+                    É Manicure / Pedicure?
+                </label>
+            </div>
         </div>
         <div style="display:flex;gap:12px">
             <button class="btn-action" id="btn-admin-save-user" onclick="adminSaveUser()">
@@ -817,7 +826,7 @@
                             <p style="color:var(--text-light);font-size:0.92rem" id="sel-prof-desc">Desc</p>
                         </div>
 
-                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px">
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">
                             <div>
                                 <label style="font-size:0.72rem;font-weight:800;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:8px">
                                     <i class="fa-solid fa-scissors" style="margin-right:4px"></i> Serviço
@@ -830,6 +839,31 @@
                                 </label>
                                 <input type="date" id="date-picker" class="input-box" onchange="renderTimeGrid()" style="margin-bottom:0">
                             </div>
+                        </div>
+
+                        <!-- SELETOR MANICURE -->
+                        <div id="manicure-selector" class="hidden" style="margin-bottom:16px;padding:18px;background:var(--female-bg);border-radius:16px;border:1.5px solid var(--female-border)">
+                            <div style="font-size:0.72rem;font-weight:900;color:var(--female-color);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px">
+                                <i class="fa-solid fa-hand-sparkles" style="margin-right:6px"></i> Qual serviço deseja?
+                            </div>
+                            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+                                <div class="manicure-opt" onclick="selManicureType('mao',this)" data-type="mao"
+                                     style="padding:14px 8px;text-align:center;border-radius:12px;border:2px solid var(--female-border);background:white;cursor:pointer;transition:all 0.2s;font-weight:800;font-size:0.85rem;color:var(--female-color)">
+                                    <i class="fa-solid fa-hand" style="display:block;font-size:1.3rem;margin-bottom:6px"></i> Mão
+                                </div>
+                                <div class="manicure-opt" onclick="selManicureType('pe',this)" data-type="pe"
+                                     style="padding:14px 8px;text-align:center;border-radius:12px;border:2px solid var(--female-border);background:white;cursor:pointer;transition:all 0.2s;font-weight:800;font-size:0.85rem;color:var(--female-color)">
+                                    <i class="fa-solid fa-shoe-prints" style="display:block;font-size:1.3rem;margin-bottom:6px"></i> Pé
+                                </div>
+                                <div class="manicure-opt" onclick="selManicureType('ambos',this)" data-type="ambos"
+                                     style="padding:14px 8px;text-align:center;border-radius:12px;border:2px solid var(--female-border);background:white;cursor:pointer;transition:all 0.2s;font-weight:800;font-size:0.85rem;color:var(--female-color)">
+                                    <i class="fa-solid fa-hands" style="display:block;font-size:1.3rem;margin-bottom:6px"></i> Ambos
+                                </div>
+                            </div>
+                            <p id="manicure-ambos-tip" class="hidden" style="margin-top:12px;font-size:0.82rem;color:var(--female-color);font-weight:700;text-align:center;background:white;padding:10px;border-radius:10px">
+                                <i class="fa-solid fa-circle-info" style="margin-right:4px"></i>
+                                Serviço duplo: serão reservados <b>2 horários consecutivos</b>
+                            </p>
                         </div>
 
                         <div style="background:var(--bg-body);padding:22px;border-radius:16px;border:1px solid var(--border)">
@@ -904,6 +938,10 @@
                             <div class="confirm-row">
                                 <span class="confirm-label"><i class="fa-solid fa-building" style="margin-right:6px"></i>Unidade</span>
                                 <span class="confirm-value" id="conf-unit">—</span>
+                            </div>
+                            <div class="confirm-row" id="conf-manicure-row" style="display:none">
+                                <span class="confirm-label"><i class="fa-solid fa-hand-sparkles" style="margin-right:6px"></i>Serviço</span>
+                                <span class="confirm-value" id="conf-manicure-type">—</span>
                             </div>
                         </div>
 
